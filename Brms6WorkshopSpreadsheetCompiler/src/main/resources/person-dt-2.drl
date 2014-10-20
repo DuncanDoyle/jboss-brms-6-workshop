@@ -1,0 +1,18 @@
+package eu.org.jboss.ddoyle.brms.workshop.dt-example;
+//generated from Decision Table
+import org.jboss.ddoyle.brms.workshop.model.Person;
+// rule values at B11, header at B6
+rule "ID change_11"
+	when
+		$person:Person(name=="Jason", surName=="Doyle")
+	then
+		System.out.println("This seems to be Jason: " + $person.getName());
+end
+
+// rule values at B12, header at B6
+rule "ID change_12"
+	when
+		$person:Person(name=="Duncan", surName=="Duncan")
+	then
+		System.out.println("This seems to be Duncan: " + $person.getName());
+end

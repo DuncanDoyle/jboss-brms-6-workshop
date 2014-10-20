@@ -1,0 +1,24 @@
+package org.jboss.ddoyle.brms.workshop.drlRules;
+
+//list any import classes here.
+import org.jboss.ddoyle.brms.workshop.model.Person;
+
+//declare any global variables here
+
+
+rule "Find Person rule"
+    when
+        $p: Person()
+    then
+        System.out.println("Found: " + $p.getName() + " " + $p.getSurname());
+end
+
+
+rule "Is under age"
+salience -10
+	when 
+		$p: Person(age < 18) 
+	then
+		System.out.println($p.getName() + " is under age.");
+end
+

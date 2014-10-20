@@ -1,0 +1,40 @@
+package org.jboss.ddoyle.brms.workshop
+
+//list any import classes here.
+import org.jboss.ddoyle.brms.workshop.model.Event
+import org.jboss.ddoyle.brms.workshop.model.EventPass
+import org.jboss.ddoyle.brms.workshop.model.IsAdult
+import org.jboss.ddoyle.brms.workshop.model.Person
+import org.jboss.ddoyle.brms.workshop.model.Ticket
+import org.jboss.ddoyle.brms.workshop.model.TicketOffer
+import org.jboss.ddoyle.brms.workshop.model.TicketOffers
+import org.jboss.ddoyle.brms.workshop.model.Venue
+
+//declare any global variables here
+global org.jboss.ddoyle.brms.workshop.model.TicketOffers ticketOffers;
+
+
+/*
+	Concepts: Tickets of type D cannot be sold to non-adults.
+	Non-adults get a 25% discount on tickets.
+	Persons with a special event pass get 10% discount on top of all discounts.
+	Golden tickets can only be sold to people with an Event pass.
+*/
+
+rule "Create TicketOffers"
+when 
+	$t: Ticket() 
+then 
+	TicketOffer tOffer = new TicketOffer($t);
+	ticketOffers.addTicket(tOffer);
+	insert(tOffer);
+end
+
+
+rule "Filter Tickets Adults"
+when
+	$p:Person(age < 18)
+	$t:Ticket(event.rating == Event.EVENT_RATING.D)
+then
+	retract($t)
+end
