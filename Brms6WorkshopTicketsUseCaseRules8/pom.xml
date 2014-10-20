@@ -7,7 +7,7 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<artifactId>Brms6WorkshopTicketsUseCaseRules1</artifactId>
+	<artifactId>Brms6WorkshopTicketsUseCaseRules8</artifactId>
 	<dependencies>
 		<!-- Project Dependencies -->
 		<dependency>
@@ -20,6 +20,10 @@
 		</dependency>
 
 		<!-- JBoss BRMS/Drools dependencies. -->
+		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-api</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>knowledge-api</artifactId>
@@ -59,4 +63,5 @@
 			<artifactId>logback-classic</artifactId>
 		</dependency>
 	</dependencies>
+
 </project>

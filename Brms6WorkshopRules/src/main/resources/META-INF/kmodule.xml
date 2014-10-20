@@ -4,7 +4,7 @@
     <kbase name="drlRules" equalsBehavior="equality" eventProcessingMode="stream" packages="org.jboss.ddoyle.brms.workshop.drlRules" default="true">
   -->
     <kbase name="drlRules" equalsBehavior="equality" eventProcessingMode="stream" packages="org.jboss.ddoyle.brms.workshop.drlRules" default="true">
-        <ksession name="ksessionDrlRules" default="true" type="stateful" clockType="pseudo" />
+        <ksession name="ksessionDrlRules" default="true" type="stateless" clockType="realtime" />
     <!--
         <ksession name="ksession-rules" default="true" type="stateful" clockType="realtime"/>
         <ksession name="ksession-rules" default="true" type="stateful" clockType="pseudo"/>
@@ -12,15 +12,15 @@
     </kbase>
     
     <kbase name="dslRules" equalsBehavior="equality" eventProcessingMode="stream" packages="org.jboss.ddoyle.brms.workshop.dslRules" default="false">
-    	<ksession name="ksessionDslRules" default="false" type="stateful" clockType="pseudo" />
+    	<ksession name="ksessionDslRules" default="false" type="stateless" clockType="realtime" />
     </kbase>
     
     <kbase name="spreadsheetRulesOne" equalsBehavior="equality" eventProcessingMode="stream" packages="org.jboss.ddoyle.brms.workshop.spreadsheetRulesOne" default="false">
-    	<ksession name="ksessionSpreadSheetOneRules" default="false" type="stateful" clockType="pseudo" />
+    	<ksession name="ksessionSpreadSheetOneRules" default="false" type="stateless" clockType="realtime" />
     </kbase>
     
     <kbase name="spreadsheetRulesTwo" equalsBehavior="equality" eventProcessingMode="stream" packages="org.jboss.ddoyle.brms.workshop.spreadsheetRulesTwo" default="false">
-    	<ksession name="ksessionSpreadSheetTwoRules" default="false" type="stateful" clockType="pseudo" />
+    	<ksession name="ksessionSpreadSheetTwoRules" default="false" type="stateless" clockType="realtime" />
     </kbase>
     
 </kmodule>

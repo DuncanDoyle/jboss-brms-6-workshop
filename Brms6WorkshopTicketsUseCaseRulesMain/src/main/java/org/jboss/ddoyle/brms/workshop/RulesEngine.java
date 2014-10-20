@@ -3,9 +3,10 @@ package org.jboss.ddoyle.brms.workshop;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.drools.builder.KnowledgeBuilder;
 import org.jboss.ddoyle.brms.workshop.model.Event;
 import org.jboss.ddoyle.brms.workshop.model.Event.EVENT_RATING;
 import org.jboss.ddoyle.brms.workshop.model.EventPass;
@@ -26,41 +27,12 @@ public class RulesEngine {
 
 	private KieContainer kieContainer;
 	
-	/*
-	public void run(Person person, boolean hasEventPass) {
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource("tickets.drl"), ResourceType.DRL);
-		addResources(kbuilder);
-		if (kbuilder.hasErrors()) {
-			throw new RuntimeException("Error building knowlegdebase." + kbuilder.getErrors());
-		}
-		kbase = kbuilder.newKnowledgeBase();
-		
-		runTicketRulesDemo(person, hasEventPass);
-	}
-	*/
 	public void run(Person person, boolean hasEventPass) {
 		KieServices kieServices = KieServices.Factory.get();
 		kieContainer = kieServices.getKieClasspathContainer();
-		
-		
-		/*
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource("tickets.drl"), ResourceType.DRL);
-		addResources(kbuilder);
-		if (kbuilder.hasErrors()) {
-			throw new RuntimeException("Error building knowlegdebase." + kbuilder.getErrors());
-		}
-		kbase = kbuilder.newKnowledgeBase();
-		*/
-		
 		runTicketRulesDemo(person, hasEventPass);
 	}
-	
-	
-	protected void addResources(KnowledgeBuilder kbuilder) {
-	}
-	
+		
 	private List<Ticket> getAvailableTickets() {
 		List<Ticket> tickets= new ArrayList<>();
 		Venue ahoyRotterdam = new Venue("Ahoy", "Rotterdam");
@@ -119,6 +91,10 @@ public class RulesEngine {
 		
 	}
 	
+	protected Map<String, Object> getGlobals() {
+		return new HashMap<String, Object>();
+	}
+	
 	private void printTicketOffers(TicketOffers ticketOffers) {
 		for (TicketOffer nextOffer: ticketOffers.getTickets()) {
 			System.out.println("TicketOffer: " + nextOffer + "\n");
@@ -139,6 +115,10 @@ public class RulesEngine {
 		
 		//Insert global. This is an empty list,but will be filled with available ticket offers by the rules engine.
 		ksession.setGlobal("ticketOffers", ticketOffers);
+		Map<String, Object> globals = getGlobals();
+		for (Map.Entry<String, Object> nextGlobal: globals.entrySet()) {
+			ksession.setGlobal(nextGlobal.getKey(), nextGlobal.getValue());
+		}
 		
 		//Insert the facts.
 		ksession.insert(person);
