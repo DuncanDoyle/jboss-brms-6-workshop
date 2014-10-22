@@ -1,0 +1,11 @@
+package org.jboss.ddoyle.brms.workshop;
+
+import org.jboss.ddoyle.brms.workshop.model.Person;
+
+rule "Start ruleflow"
+salience 100
+when
+	$p: Person();
+then
+	System.out.println("Found person: " + $p.getName());	 
+end
