@@ -32,6 +32,12 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.kie</groupId>
+				<artifactId>kie-ci</artifactId>
+				<version>${version.org.kie}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>knowledge-api</artifactId>
 				<version>${version.org.kie}</version>
