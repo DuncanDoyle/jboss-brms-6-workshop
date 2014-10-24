@@ -54,7 +54,7 @@ rule "Filter Tickets Adults"
 ruleflow-group "filter" 
 when
 	$p:Person()
-	not (exists (IsAdult(person == $p)))
+	not (IsAdult(person == $p))
 	$t:Ticket(event.rating == Event.EVENT_RATING.D)
 then
 	retract($t)
@@ -64,7 +64,7 @@ rule "Filter Golden tickets"
 ruleflow-group "filter"
 when
 	$p:Person()
-	not (exists (EventPass(person == $p)))
+	not (EventPass(person == $p))
 	$t: Ticket(ticketClass == Ticket.TICKET_CLASS.GOLD)
 then
 	retract($t)
@@ -85,7 +85,7 @@ ruleflow-group "discount"
 lock-on-active
 when
 	$p:Person()
-	not (exists(IsAdult(person == $p)))
+	not (IsAdult(person == $p))
 	$t: TicketOffer()
 	$d: Integer() from discountService.getDiscount(DiscountService.DISCOUNT_CODE.NON_ADULT);
 then

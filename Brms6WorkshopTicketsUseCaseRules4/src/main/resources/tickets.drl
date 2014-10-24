@@ -43,7 +43,7 @@ rule "Filter Golden tickets"
 salience 75
 when
 	$p:Person()
-	not (exists (EventPass(person == $p)))
+	not (EventPass(person == $p))
 	$t: Ticket(ticketClass == Ticket.TICKET_CLASS.GOLD)
 then
 	retract($t)

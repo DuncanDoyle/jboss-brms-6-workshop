@@ -43,7 +43,7 @@ rule "Filter Tickets Adults"
 salience 100
 when
 	$p:Person()
-	not(exists(IsAdult()))
+	not(IsAdult())
 	$t:Ticket(event.rating == Event.EVENT_RATING.D)
 then
 	retract($t)
@@ -53,7 +53,7 @@ rule "Filter Golden tickets"
 salience 75
 when
 	$p:Person()
-	not (exists (EventPass(person == $p)))
+	not (EventPass(person == $p))
 	$t: Ticket(ticketClass == Ticket.TICKET_CLASS.GOLD)
 then
 	retract($t)
@@ -82,7 +82,7 @@ agenda-group "discount"
 lock-on-active
 when
 	$p:Person()
-	not(exists(IsAdult()))
+	not(IsAdult())
 	$t: TicketOffer()
 then
 	modify($t) {
