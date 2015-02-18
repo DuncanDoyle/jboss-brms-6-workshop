@@ -11,22 +11,25 @@ In version 6.x of JBoss BRMS and BPMSuite, the Drools API has changed quite dras
 Furthermore, the platform has focussed on utilizing standards and defacto standards for storage and build management. For example, the new KIE, Drools and jBPM platform heavily utilize *Maven* as the build and
 deployment management platform and the BRMS and BPMSuite platforms use *Git* as the source code management system.
 
-KieServices:: Interface into the KIE API and runtime. Built by the KieServices.Factory: 'KieServices.Factory.get();'
-KieContainer:: Container for KieBases and KieSessions. Provides the API to build new _Stateless_ and _Statefull_ KieSessions.
-KieSession:: A Drools/KIE session in which _facts_ and/or _events_ can be inserted and on which _rules_ are executed. A session can be either _Stateful_ or _Stateless_
-	Stateful KieSession::: A _KieSession_ is by default _stateful_. This implies that the session retains state until it is expicitly disposed by calling the 'KieSession.dispose()' method.
+=== The KIE API
+This paragraph discusses the main KIE API classes. The JavaDoc for the API can be found http://docs.jboss.org/drools/release/latest/kie-api-javadoc/index.html[here].
+
+http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/KieServices.html[KieServices]:: Interface into the KIE API and runtime. Built by the KieServices.Factory: 'KieServices.Factory.get();'
+http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/runtime/KieContainer.html[KieContainer]:: Container for KieBases and KieSessions. Provides the API to build new _Stateless_ and _Stateful_ KieSessions.
+http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/runtime/KieSession.html[KieSession]:: A Drools/KIE session in which _facts_ and/or _events_ can be inserted and in which _rules_ are executed. A session can be either _Stateful_ or _Stateless_
+	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/runtime/KieSession.html[Stateful KieSession]::: A _KieSession_ is by default _stateful_. This implies that the session retains state until it is expicitly disposed by calling the 'KieSession.dispose()' method.
 				This implies that a system can continuously insert facts and fire rules until the session is explicitly disposed.
-	Stateless KieSession::: A _stateless_ KieSession is basically a wrapper around a _stateful_ KieSession. The differences is that one cannot interact with the session.
+	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/runtime/StatelessKieSession.html[Stateless KieSession]::: A _stateless_ KieSession is basically a wrapper around a _stateful_ KieSession. The differences is that one cannot interact with the session.
 				The session's 'execute' method can be called only once, after which the session is automatically disposed. Interaction with the session is done by passing Drools 'Command'
 				objects to the session. The session is automically disposed after the commands have been executed.
-EventListeners:: Drools provides a pluggable EventListener system. The system provides 3 interfaces:
-	AgendaEventListener::: Provides listener functionality for _Agenda_ events, e.g. 'matchCreated', 'beforeMatchFired', 'afterMatchFired', 'beforeRuleFlowGroupActivated', etc. This allows one to, for example.
+http://docs.oracle.com/javase/6/docs/api/java/util/EventListener.html[EventListeners]:: Drools provides a pluggable EventListener system based on the standard Java EventListener interface. The system provides 3 interfaces:
+	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/event/rule/AgendaEventListener.html[AgendaEventListener]::: Provides listener functionality for _Agenda_ events, e.g. 'matchCreated', 'beforeMatchFired', 'afterMatchFired', 'beforeRuleFlowGroupActivated', etc. This allows one to, for example.
 				implement loggers, auditing functionality (which rules have fired) and debugging functionality. In a recent Red Hat Services engagement, this feature was used to implement
 				a framework to verify how many rules are covered during a JUnit test run.
-	RuleRuntimeEventListener::: Provides listener functionality for _WorkingMemory_ events. These events are fired when objects (facts, events) are inserted in, updated in or removed from the session's WorkingMemory.
-	ProcessEventListener::: Listens to process events like beforeProcessStarted, afterProcessStarted, beforeNodeTriggered, etc. This interface is for example iplemented by the _JPAWorkingMemoryDbLogger_ which is 
+	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/event/rule/RuleRuntimeEventListener.html[RuleRuntimeEventListener]::: Provides listener functionality for _WorkingMemory_ events. These events are fired when objects (facts, events) are inserted in, updated in or removed from the session's WorkingMemory.
+	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/event/process/ProcessEventListener.html[ProcessEventListener]::: Listens to process events like beforeProcessStarted, afterProcessStarted, beforeNodeTriggered, etc. This interface is for example iplemented by the _JPAWorkingMemoryDbLogger_ which is 
 				responsible for logging jBPM process data to database for, for example, BAM purposes.
-AgendaFilter:: The _AgendeFilter_ interface provides a means to control whether a rule should be fired or not. By implementing the 'boolean accept(Match match)' method, one can control whether the rule firing is accepted for
+http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/runtime/rule/AgendaFilter.html[AgendaFilter]:: The _AgendeFilter_ interface provides a means to control whether a rule should be fired or not. By implementing the 'boolean accept(Match match)' method, one can control whether the rule firing is accepted for
 a given _Match_ or not. This can for example be based on the name of the rule, the facts that caused the rule to match, etc. This interface can for example be used in _JUnit_ tests to only allow the rule under test to fire.
 
 === Drools Resources
