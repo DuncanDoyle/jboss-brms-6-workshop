@@ -269,5 +269,5 @@ A solution is implemented in the *Brms6WorkshopTicketsUseCaseRules8* project.
 Start with the *Brms6WorkshopTicketsUseCaseRules8* project. We will now implement our final 2 rules. The requirement is that we add an additional 5% discount to all tickets if the number of TicketOffers returned is equal to or more than 8.
 Hint: Use an 'accumulate' function.
 
-NOTE: This is a bit of strange use-case. Normally a discount like this would be applied if someone would order an x-amount of ticets. However, this would require me to implement the actual process in which the _Person_ actually selects
+NOTE: This is a bit of strange use-case. Normally a discount like this would be applied if someone would order an x-amount of tickets. However, this would require me to implement the actual process in which the _Person_ actually selects
 a number of _TicketOffers_ which he wants to buy, which is a bit more work to implement. I still wanted to showcase the 'accumulate' function without implementing this extra process, hence this rather weird use-case ;-).
