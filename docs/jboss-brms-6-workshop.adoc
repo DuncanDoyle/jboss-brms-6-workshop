@@ -23,7 +23,7 @@ http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/runtime/
 				The session's 'execute' method can be called only once, after which the session is automatically disposed. Interaction with the session is done by passing Drools 'Command'
 				objects to the session. The session is automically disposed after the commands have been executed.
 http://docs.oracle.com/javase/6/docs/api/java/util/EventListener.html[EventListeners]:: Drools provides a pluggable EventListener system based on the standard Java EventListener interface. The system provides 3 interfaces:
-	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/event/rule/AgendaEventListener.html[AgendaEventListener]::: Provides listener functionality for _Agenda_ events, e.g. 'matchCreated', 'beforeMatchFired', 'afterMatchFired', 'beforeRuleFlowGroupActivated', etc. This allows one to, for example.
+	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/event/rule/AgendaEventListener.html[AgendaEventListener]::: Provides listener functionality for _Agenda_ events, e.g. `matchCreated`, `beforeMatchFired`, `afterMatchFired`, `beforeRuleFlowGroupActivated`, etc. This allows one to, for example.
 				implement loggers, auditing functionality (which rules have fired) and debugging functionality. In a recent Red Hat Services engagement, this feature was used to implement
 				a framework to verify how many rules are covered during a JUnit test run.
 	http://docs.jboss.org/drools/release/latest/kie-api-javadoc/org/kie/api/event/rule/RuleRuntimeEventListener.html[RuleRuntimeEventListener]::: Provides listener functionality for _WorkingMemory_ events. These events are fired when objects (facts, events) are inserted in, updated in or removed from the session's WorkingMemory.
@@ -49,13 +49,16 @@ write rules in a native language. E.g. it has been used in a customer project wh
 image:images/dsl-rules.png["DSL Rules",height=256] +
 image:images/dslr-rules.png["DSLR Rules",height=128]
 
+RDSLR:: Guided rule with DSL. This is a filetype that's created by the JBoss BRMS web-based rule-editors in the KIE WorkBench.
+
 BPMN2:: Business Process Modeling and Notation, a language in which to define business processes. Can be used in BRMS 6 to define so called _RuleFlows_ (which is a supported feature) and in BPMSuite 6 to define jBPM6 business processes.
 
 image:images/bpmn2-ruleflow.png["BPMN2 RuleFlow",height=128]
 
 === Drools Rule Language: Rule Layout and keywords
 A Drools rule basically contains of 3 parts:
-Left Hand Side (LHS):: the rule constraints. Here we match the facts based constraints.
+
+Left Hand Side (LHS):: the rule constraints. This is the conditional part of the rule. It consists of zero or more conditional elements. Facts are matched with the conditional elements, and if all elements match, the rule is activated.
 Right Hand Sice (RHS):: the rule consequence. This defines the action performed when the rule is fired.
 Rule attributes and meta-data:: additional rule attributes that can influence rule odering rule exection, etc.
 
@@ -65,10 +68,10 @@ Drools defines a vast amount of keywords that can be used in the LHS and RHS of 
 For a complete overview of keywords, please consult the Drools documentation: http://docs.jboss.org/drools/release/6.1.0.Final/drools-docs/html_single/index.html#d0e5393
 
 === Rule file keywords
-* package: defines the package of the rulebase (just like a Java package).
-* import: import of Java classes to be used by the ruleset.
+* package: defines the package-name of the rulebase (just like a Java package).
+* import: import of Java classes to be used by in the rules.
 * function: this keyword allows us to define a function inside the rulebase.
-* declare: allows us to declare fact types inside the rulebase instead of in Java. Also allows 
+* declare: allows us to declare fact types directly inside the rulebase definition file instead of in Java. Also allows to add annotations to existing Java classes, for example to mark an existing class as a Drools `Event` (used in Complex Event Processing). 
 * global: declare a global variable. This is not a _fact_ inside the workingmemory, so the engine will not reason over _globals_. A global can be used, for example, to store the result of the rule firing (e.g. warnings, errors, filtered tickets, discounts, etc.).
 
 ==== attributes
@@ -91,13 +94,14 @@ as well as inline custom code.
 
 === The Rule Network
 The rule network (or graph) defines the reasoning network through which our facts flow. It defines an efficient discrimination network through which data flows. The nodes at the top of the network would have many matches, 
-and as we go down the network, there would be fewer matches. At the very bottom of the network are the terminal nodes.
+and as we go down the network, there would be fewer matches. At the very bottom of the network are the terminal nodes. In this paragraph we will give a brief introduction to the network and Rete algorithm. For a more in-depth 
+explanation please consult the http://docs.jboss.org/drools/release/latest/drools-docs/html/HybridReasoningChapter.html#ReteOO[Drools Manual].
 
 A network consists of various types of nodes.
 
 image:images/rule-node-legenda.png["Rule Network Nodes",height="384"]
 
-* ObjectTypeNode: Match on _Objects_ and can propaate to ObjectTypeNodes can propagate to AlphaNodes, LeftInputAdapterNodes and BetaNodes. AlphaNodes are used to evaluate literal
+* ObjectTypeNode: Matches on _Objects_ and can propagate to AlphaNodes, LeftInputAdapterNodes and BetaNodes. AlphaNodes are used to evaluate literal
 * AlphaNode: Used to evaluate literal conditions.
 * LeftInputAdapterNode: This takes an Object as an input and propagates a single Object Tuple, which can be then fed into a BetaNode.
 * BetaNode: Evaluates constraints on two or more facts. The let input is for tuples, the right input is for facts.
@@ -116,13 +120,13 @@ image:images/rule-network-tree.png["Rule Network Tree", height=448]
  
 
 === ReteOO and PHREAK
-Drools was based on the RETE (pronounced: ReeTee), a pattern matching algorithm for implementing production rule systems (http://en.wikipedia.org/wiki/Rete_algorithm). The implementation in Drools was so called ReteOO, a 
+Drools was based on the RETE (pronounced: ReeTee), a pattern matching algorithm for implementing production rule systems (http://en.wikipedia.org/wiki/Rete_algorithm). The implementation in Drools is called ReteOO, a 
 Java-based RETE algorithm with enhancements. This algorithm is eager in nature, which can lead to much wasted work (where wasted work is classified as matching efforts that don't result in rule-firing). This is demonstrated
 by the fact that most of the work in Drools 5 is done during the insert, update and delete actions. I.e. the rules in Drools 5 are not evaluated when calling _fireAllRules_, but when facts are inserted in, updated in and deleted from
 the WorkingMemory. Only the Right-Hand-Side of the rules is executed during a 'fireAllRules()' call.
 
-In Drools vesion 6, the _ReteOO_ algorithm was replaced by the _PHREAK_ algorithm, a word-play on Hybrid Reasoningn. PHREAK is a lazy evalutation algorithm in which the rule evaluation is done in the 'fireAllRules()' phase 
-rather than the insert/update/delete phase. This is done through a goal-oriented, heuristics-base, algorithm: To learn more about _PHREAK_, please consult the following blog-post by the Drools project lead Mark Proctor: http://blog.athico.com/2013/11/rip-rete-time-to-get-phreaky.html
+In Drools vesion 6, the _ReteOO_ algorithm was replaced by the _PHREAK_ algorithm, a word-play on Hybrid Reasoning. PHREAK is a lazy evalutation algorithm in which the rule evaluation is done in the 'fireAllRules()' phase 
+rather than the insert/update/delete phase. This is done through a goal-oriented, heuristics-based, algorithm: To learn more about _PHREAK_, please consult the following blog-post by the Drools project lead Mark Proctor: http://blog.athico.com/2013/11/rip-rete-time-to-get-phreaky.html
 
 === Drools and Maven: The KJAR
 Up to version 5 of Drools, rules were added to a rulebase via a programming API. The idea was to create a so called _KnowledgeBuilder_ to which various resources were added. Next, this _builder_ was used to 
