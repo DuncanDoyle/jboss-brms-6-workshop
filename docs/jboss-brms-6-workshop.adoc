@@ -188,6 +188,7 @@ The link:../Brms6WorkshopKieScannerApp[Brms6WorkshopKieScannerApp] example shows
 image:images/kiescanner.png["KieScanner",height=384]
 
 To run the demo, do the following:
+
 . run _mvn clean install_ on the ../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project to install the KJAR in your local .m2 repository.
 . run _mvn clean install exec:java_ on the ./Brms6WorkshopKieScannerApp[Brms6WorkshopKieScannerApp] project to start the application. If the app has been started correctly, it will print the line _Found person: Duncan_ every 5 seconds.
 . alter the rule in th rules.drl file in the ../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project. For example, change the text in the `System.out.println` in the RHS of the rule. 
