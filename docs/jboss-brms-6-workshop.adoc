@@ -219,31 +219,31 @@ The _fact model_ contains the classes that define the facts over which the rules
 The examples are modelled around an  online ticketing system. The rules are responsible for filtering out tickets that are not available to a certain person (e.g. under age) and applying initial discount to the ticket prices 
 (e.g. the person has a discount pass, the person is under age, etc.). To do this, we insert 3 types of facts into the session:
 
-. Ticket
-. Person
-. EventPass
+. `Ticket`
+. `Person`
+. `EventPass`
 
-The result, which is a list of _TicketOffers_ with the tickets available for this _Person_, including calculated discount. This is passed into the global _TicketOffers_.
+The result, which is a list of `TicketOffer`s with the tickets available for this `Person`, including calculated discount. This is passed into the global `TicketOffer`s.
 
 === The implementation
-The main logic in these labs is defined in the *Brms6WorkshopTicketsUseCaseRulesMain* project. It contains the logic to build a _Kie_Container_ and _KieSession_, creates the fact objects, inserts them into the _KieSession_ and fires the rules.
-The various other projects define the ruleset(s) that are used at runtime. We will start with a very simple rulebase with just 2 rules, and gradually build up a more complex set of rules.
+The main logic in these labs is defined in the *Brms6WorkshopTicketsUseCaseRulesMain* project. It contains the logic to build a `KieContainer` and `KieSession`, creates the fact objects, inserts them into the `KieSession` 
+and fires the rules. The various other projects define the ruleset(s) that are used at runtime. We will start with a very simple rulebase with just 2 rules, and gradually build up a more complex set of rules.
 
 ==== Lab 1
-We start with 2 simple rules in *Brms6WorkshopTicketsUseCaseRules1*, one that creates the _TicketOffer_s, and one that filters out the tickets for people below the age of 18. Execute the application by running the _Main_ class. Observe the output. What is wrong with our rulebase?
-Can you fix it? How? 
+We start with 2 simple rules in *Brms6WorkshopTicketsUseCaseRules1*, one that creates the `TicketOffer`s, and one that filters out the tickets for people below the age of 18. Execute the application by running 
+the `Main` class. Observe the output. What is wrong with our rulebase? Can you fix it? How? 
 
 A possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules2*.
 
 ==== Lab 2
-Start with the *Brms6WorkshopTicketsUseCaseRules2* project. We will now implement a rule filters out all tickets out all tickets with 'TICKET_CLASS.GOLD' if our _Person_ does not have an _EventPass_. I.e. we only allow people with a special 
-event-pass to purchase these tickets.
+Start with the *Brms6WorkshopTicketsUseCaseRules2* project. We will now implement a rule filters out all tickets out all tickets with 'TICKET_CLASS.GOLD' if our `Person` does not have an `EventPass`. 
+I.e. we only allow people with a special event-pass to purchase these tickets.
 
 A possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules3*.
 
 ==== Lab 3
 Start with the *Brms6WorkshopTicketsUseCaseRules3* project. In this lab implement 2 discount rules. The first rule gives a 25% discount for on all tickets for non-adults (people below the age of 18) and the second rule applies
-a 10% discount on all tickets for people with an _EventPass_.
+a 10% discount on all tickets for people with an `EventPass`.
 
 First try to implement a single rule and observe what happens. If you encounter an issue, try to solve this issue first. Then implement the second discount rule. Again, if any problems occur, try to solve them. Feel free to share 
 anything you encounter with the group. We're here to learn :-)
@@ -251,9 +251,10 @@ anything you encounter with the group. We're here to learn :-)
 Again, a possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules4*.
 
 === Lab 4
-Start with the *Brms6WorkshopTicketsUseCaseRules4* project. If all is well, we have now got 2 rules in our ruleset that check on the same constraint, namely if a Person is under the age of 18. One of the powers of Drools is the possibility
-to infer new data (facts) in rules, and add this new inferred data as a constraint to other rules. We're going to apply this technique in this lab. In our fact model, we have a class called _IsAdult_. Create a new rule that infers this
-fact from the facts entered into working memory, and inserts this new fact into the engine. Next, use this new fact in the constraint of the rules that check if a person is underage.
+Start with the *Brms6WorkshopTicketsUseCaseRules4* project. If all is well, we have now got 2 rules in our ruleset that check on the same constraint, namely if a `Person` is under the age of 18.
+ One of the powers of Drools is the possibility to infer new data (facts) in rules, and add this new inferred data as a constraint to other rules. We're going to apply this technique in this lab.
+
+In our fact model, we have a class called `IsAdult`. Create a new rule that infers this fact from the facts entered into working memory, and inserts this new fact into the engine. Next, use this new fact in the constraint of the rules that check if a person is underage.
 
 A possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules5*.
 
@@ -262,26 +263,28 @@ Start with the *Brms6WorkshopTicketsUseCaseRules5* project. We've heavily used t
 into various 'agenda-groups', and control the order of execution of the rules by setting the focus on the correct agenda-group.
 
 Group the rules in 4 different 'agenda-groups': init, filter, create-offers and discount. Next, create a rule that fires first (in the _init_ 'agenda-group') and set the focus of the agende-groups in the RHS (consuquence) of the rule.
-The code to set the focus of an 'agenda-group' in the RHS of a rule is: 'kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("init").setFocus();'
+The code to set the focus of an 'agenda-group' in the RHS of a rule is: `kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("init").setFocus();`
 
 Note that the 'agenda-group' is a stack-based system on which we push and from which we pop agenda-groups.
 
 A possible solutions is implemented in *Brms6WorkshopTicketsUseCaseRules6*.
 
 === Lab 6
-Start with the *Brms6WorkshopTicketsUseCaseRules6* project. Instead of 'agenda-group', we will now define the ordering of the rule execution with a BPMN2 RuleFlow. Change the implementation into one that use a RuleFlow and 'ruleflow-group'.
+Start with the *Brms6WorkshopTicketsUseCaseRules6* project. Instead of 'agenda-group', we will now define the ordering of the rule execution with a BPMN2 RuleFlow. Change the implementation into one 
+that use a RuleFlow and `ruleflow-group`.
 
 A solution is implemented in the *Brms6WorkshopTicketsUseCaseRules7* project.
 
 === Lab 7
-Start with the *Brms6WorkshopTicketsUseCaseRules7* project. In the current rulebase, the discount values are statically defined. We however want to retrieve these discounts from a Service. Therefore, we've added the 'DiscountService' 
-Java class to our project. Use this class to retrieve the discount values for 2 discount rules. Hint: Use the 'from' keyword.
+Start with the *Brms6WorkshopTicketsUseCaseRules7* project. In the current rulebase, the discount values are statically defined. We however want to retrieve these discounts from a Service. Therefore, we've added the `DiscountService` 
+Java class to our project. Use this class to retrieve the discount values for 2 discount rules. Hint: Use the `from` keyword.
 
 A solution is implemented in the *Brms6WorkshopTicketsUseCaseRules8* project.
 
 === Lab 8
 Start with the *Brms6WorkshopTicketsUseCaseRules8* project. We will now implement our final 2 rules. The requirement is that we add an additional 5% discount to all tickets if the number of TicketOffers returned is equal to or more than 8.
-Hint: Use an 'accumulate' function.
+
+Hint: Use an `accumulate` function.
 
 NOTE: This is a bit of strange use-case. Normally a discount like this would be applied if someone would order an x-amount of tickets. However, this would require me to implement the actual process in which the _Person_ actually selects
 a number of _TicketOffers_ which he wants to buy, which is a bit more work to implement. I still wanted to showcase the 'accumulate' function without implementing this extra process, hence this rather weird use-case ;-).
