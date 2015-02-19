@@ -189,9 +189,9 @@ image:images/kiescanner.png["KieScanner",height=384]
 
 To run the demo, do the following:
 
-. run _mvn clean install_ on the ../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project to install the KJAR in your local .m2 repository.
-. run _mvn clean install exec:java_ on the ./Brms6WorkshopKieScannerApp[Brms6WorkshopKieScannerApp] project to start the application. If the app has been started correctly, it will print the line _Found person: Duncan_ every 5 seconds.
-. alter the rule in th rules.drl file in the ../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project. For example, change the text in the `System.out.println` in the RHS of the rule. 
+. run _mvn clean install_ on the link:../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project to install the KJAR in your local .m2 repository.
+. run _mvn clean install exec:java_ on the link:../Brms6WorkshopKieScannerApp[Brms6WorkshopKieScannerApp] project to start the application. If the app has been started correctly, it will print the line _Found person: Duncan_ every 5 seconds.
+. alter the rule in the link:../Brms6WorkshopKieScannerRules/src/main/resources/rules.drl[rules.drl] file in the link:../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project. For example, change the text in the `System.out.println` in the RHS of the rule. 
 Run _mvn clean install_. This will install a new version of the KJAR in your local .m2 repository.
 . Check the output if the _Brms6WorkshopKieScannerApp_ that is still running. If everything has been done correctly, the `KieScanner` should automatically pick-up the new KJAR and start processing the data with the new rules.
 
