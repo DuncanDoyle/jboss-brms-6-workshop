@@ -133,19 +133,19 @@ Up to version 5 of Drools, rules were added to a rulebase via a programming API.
 create a Drools _KnowlegdeBase_ to create a _KnowledgeSession_ (either _Stateful_ or _Stateless_). When creating rule packages via the Drools Guvnor web-interface, rules were compiled into _.pkg_ files, a 
 proprietary packaging format.
 
-In version 6, the concept of _convention over configuration_ has been adopted. Proprietary ways of packaging (_.pkg_) have been changed to Maven. In Drools 6, the rule definitions are packaged in so called _KJARs_, 
-or _Knowledge JARs_. A _KJAR_ is nothing more than a standard _JAR_ file with a _kmodule.xml_ descriptor in its _META-INF_ directory.
+In version 6, the concept of _convention over configuration_ has been adopted. Proprietary ways of packaging (_.pkg_) has been replaced with a Maven-based packaging approach. In Drools 6, the rule definitions 
+are packaged in so called _KJARs_, or _Knowledge JARs_. A _KJAR_ is nothing more than a standard _JAR_ file with a _kmodule.xml_ descriptor in its _META-INF_ directory.
 
 A _kmodule.xml_ allows one to define and configure (named) _KieBases_ and _KieSessions_. For example, we can define which packages in a KJAR are added to a _KieBase_. This allows us to add different rule defintions
-to a KJAR and define a separate _KieBase_ per rule resource. Furthermore, we can configure the session's _event-mode_, _cloud_ or _stream_ (for Complex Event Processing scenarios). We can configure which _clock_
-is used by the session (_realtime_ or _pseudo_), and we can define which WorkItemHandlers are configured on a session (which is used in jBPM6 environments) and which listeners we want to attach to a KieSession.
+to a KJAR and define a separate _KieBase_ per rule resource or per set of rule resources. Furthermore, we can configure the session's _event-mode_, _cloud_ or _stream_ (for Complex Event Processing scenarios). 
+We can configure which _clock_ is used by the session (_realtime_ or _pseudo_), and we can define which WorkItemHandlers are configured on a session (which is used in jBPM6 environments) and which listeners we want to attach to a KieSession.
 
 image:images/kmodule-example.png["KModule.xml",height=384]
 
 image:images/kmodule-example-2.png["KModule.xml",height=384]
 
 === Example API usage
-As mentioned in the previous section, prior to Drools 6, one required quite a bit of code to build _KnowledgeBase_ and _KnowlegdeSession, as is shown below:
+As mentioned in the previous section, prior to Drools 6, one required quite a bit of code to build _KnowledgeBase_ and _KnowlegdeSession_, as is shown below:
 
 image:images/drools-5-knowledgebase-resources.png["Drools 5 KnowledgeBase resources",height=256]
 
@@ -154,9 +154,9 @@ image:images/drools-5-knowledgebase-resource.png["Drools 5 KnowledgeBase resourc
 image:images/drools-5-session.png["Drools 5 session",height=256]
 
 
-The next example shows loading of the same rule-base in Drools 6. Due to the use of _convention over configuration_, the rule-base is automatically created using the configuration in the _kmodule.xml_ descriptor file.
-A _KieServices_ implementation is retrieved from the _KieServices.Factory_ from which a new _KieContainer_ is constructed.
-The _KieSession_ is created by the _KieContainer_, facts are inserted and the rules are fired. After the rule-firing, the _KieSession_ is disposed, releasing the resources.
+The next example shows how we can load the same rule-base in Drools 6. Due to the use of _convention over configuration_, the rule-base is automatically created using the configuration in the _kmodule.xml_ descriptor file.
+A `KieServices` implementation is retrieved from the `KieServices.Factory` from which a new `KieContainer` is constructed.
+The `KieSession` is created by the `KieContainer`, facts are inserted and the rules are fired. After the rule-firing, the _KieSession_ is disposed, releasing the resources.
 
 image:images/drools-6-kiecontainer.png["Drools 6 KieContainer",height=256]
 
@@ -177,16 +177,22 @@ And another small example:
 An ofter heared requirement is the ability to dynamically load and/or re-load rules at runtime. A use-case for this is to be able to update rules at runtime without having to restart the application that uses the engine.
 In previous versions of Drools this was accomplished by the _KnowledgeAgent_, that would scan a _ChangeSet.xml_ file for changes in the ruleset.
 
-In Drools 6, this is implemented via the _KieScanner_. This scanner periodically scans the Maven repository, from which the KJAR was retrieved (using, for example, an @ReleaseId reference), for changes. When a change in 
-the KJAR is detected, the KJAR is retrieved from the repository, compiled and configured on the _KieContainer_. When a new session is retrieved from the _KieContainer_, it will use the new _KieBase_ with the new rules.
+In Drools 6, this is implemented via the `KieScanner`. This scanner periodically scans the Maven repository, from which the KJAR was retrieved (using, for example, an `@ReleaseId` reference), for changes. When a change in 
+the KJAR is detected, the KJAR is retrieved from the repository, compiled and configured on the `KieContainer`. When a new session is retrieved from the `KieContainer`, it will use the new `KieBase` with the new rules.
 
 .KieScanner and existing KieSessions
-NOTE: When the KieScanner finds a new KJAR and the KieContainer is updated, only newly created KieSessions will use the new rules. Existing KieSession will continue using the old rule-base.
+NOTE: When the `KieScanner` finds a new KJAR and the `KieContainer` is updated, only newly created `KieSessions` will use the new rules. Existing `KieSessions` will continue to use the old rule-base.
 
-We will later look at an example of the _KieScanner_ functionality when we look at the Brms6WorkshopKieScannerApp. This is an excerpt of the code of that sample application which demonstrates the scanner API:
+The link:../Brms6WorkshopKieScannerApp[Brms6WorkshopKieScannerApp] example shows the `KieScanner` functionality. This is an excerpt of the code of that sample application which demonstrates the scanner API:
 
 image:images/kiescanner.png["KieScanner",height=384]
 
+To run the demo, do the following:
+. run _mvn clean install_ on the ../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project to install the KJAR in your local .m2 repository.
+. run _mvn clean install exec:java_ on the ./Brms6WorkshopKieScannerApp[Brms6WorkshopKieScannerApp] project to start the application. If the app has been started correctly, it will print the line _Found person: Duncan_ every 5 seconds.
+. alter the rule in th rules.drl file in the ../Brms6WorkshopKieScannerRules[Brms6WorkshopKieScannerRules] project. For example, change the text in the `System.out.println` in the RHS of the rule. 
+Run _mvn clean install_. This will install a new version of the KJAR in your local .m2 repository.
+. Check the output if the _Brms6WorkshopKieScannerApp_ that is still running. If everything has been done correctly, the `KieScanner` should automatically pick-up the new KJAR and start processing the data with the new rules.
 
 === Playtime
 Now that we've seen some of the Drools APIs, and some of the capabilities, let's start playing with some code and rules. The *Brms6WorkshopRules* project contains a _Main_ class which demonstrates how to use the KIE API
