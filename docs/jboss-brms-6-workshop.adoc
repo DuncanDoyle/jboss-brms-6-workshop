@@ -69,7 +69,7 @@ For a complete overview of keywords, please consult the Drools documentation: ht
 
 === Rule file keywords
 * package: defines the package-name of the rulebase (just like a Java package).
-* import: import of Java classes to be used by in the rules.
+* import: import of Java classes to be used in the rules.
 * function: this keyword allows us to define a function inside the rulebase.
 * declare: allows us to declare fact types directly inside the rulebase definition file instead of in Java. Also allows to add annotations to existing Java classes, for example to mark an existing class as a Drools `Event` (used in Complex Event Processing). 
 * global: declare a global variable. This is not a _fact_ inside the workingmemory, so the engine will not reason over _globals_. A global can be used, for example, to store the result of the rule firing (e.g. warnings, errors, filtered tickets, discounts, etc.).
