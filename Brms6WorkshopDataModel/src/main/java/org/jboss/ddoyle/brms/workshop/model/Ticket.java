@@ -83,7 +83,7 @@ public class Ticket {
 	@Override
 	public int hashCode() {
 		//@formatter:off
-		return new HashCodeBuilder(7, 42).
+		return new HashCodeBuilder(7, 43).
 				        append(getEvent()).
 				        append(getVenue()).
 				        append(getDate()).
