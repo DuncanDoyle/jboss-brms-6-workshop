@@ -22,6 +22,14 @@ global org.jboss.ddoyle.brms.workshop.model.TicketOffers ticketOffers;
 	Golden tickets can only be sold to people with an Event pass.
 */
 
+/*
+ The idea is to use a flow of rules
+
+ Technical Rules (assess whether someone is an adult) => Filter (filters tickets we can't sell to this person) -> Create TicketOffers with tickets that all stil there -> Apply discounts on the offers -> Apply additional discounts because of a special card,
+
+ Changing the ticket offers can cause rules to fire again, so this might be a nice use-case.
+*/
+
 rule "Agenda-Group setup"
 salience 100
 when
@@ -52,6 +60,7 @@ then
 	ticketOffers.addTicket(tOffer);
 	insert(tOffer);
 end
+
 
 rule "Filter Tickets Adults"
 agenda-group "filter" 

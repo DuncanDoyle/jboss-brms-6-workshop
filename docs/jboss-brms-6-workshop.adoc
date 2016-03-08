@@ -282,9 +282,13 @@ Java class to our project. Use this class to retrieve the discount values for 2 
 A solution is implemented in the *Brms6WorkshopTicketsUseCaseRules8* project.
 
 === Lab 8
-Start with the *Brms6WorkshopTicketsUseCaseRules8* project. We will now implement our final 2 rules. The requirement is that we add an additional 5% discount to all tickets if the number of TicketOffers returned is equal to or more than 8.
+Start with the *Brms6WorkshopTicketsUseCaseRules8* project. This is actually the same starting point as Lab 6, hence, the rules use Agenda-Groups instead of BPMN2 RuleFlow-Groups.
 
-Hint: Use an `accumulate` function.
+In this lab we will work with the Drools Truth Maintenance System (TMS). TMS works around the concept of _Logical Inserts_. When a fact is inserted into the session in the _standard/normal_ way, the fact is only removed from the session when it is explicitly removed by Java code or by (another) rule. When you logically insert a fact into the session, the fact is automatically removed when the conditions that logically inserted the fact are no longer true.
 
-NOTE: This is a bit of strange use-case. Normally a discount like this would be applied if someone would order an x-amount of tickets. However, this would require me to implement the actual process in which the _Person_ actually selects
-a number of _TicketOffers_ which he wants to buy, which is a bit more work to implement. I still wanted to showcase the 'accumulate' function without implementing this extra process, hence this rather weird use-case ;-).
+One can logically insert a fact into the session by using the `insertLogical` keyword.
+
+Using this mechanism, we can rewrite the rules in such a way that the order of execution of the rules (especially the _filter_ rules) is no longer important. Remove the "Agenda-Group setup" rule from the DRL. Remove the `agenda-group` definitions from the rules, and rewrite the rules in such a way that it produces the same output as when using the Agenda Groups.
+
+NOTE: Using TMS can have some performance impact, so the implementation of Lab 8, using logical inserts, is not necessarily a better implementation than the implementation using agenda-groups. The lab has been constructed to explain the concept of _logical inserts_, not to implement the best performing rule-base.
+
