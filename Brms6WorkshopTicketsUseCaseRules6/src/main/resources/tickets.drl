@@ -35,10 +35,10 @@ salience 100
 when
 	Person();
 then
-	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("init").setFocus();
-	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("filter").setFocus();
-	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("create-offers").setFocus();
 	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("discount").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("create-offers").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("filter").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("init").setFocus();
 end
 
 
