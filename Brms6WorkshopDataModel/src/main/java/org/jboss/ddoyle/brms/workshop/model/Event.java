@@ -1,5 +1,7 @@
 package org.jboss.ddoyle.brms.workshop.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -36,6 +38,35 @@ public class Event {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this).append("name", getName()).append("rating", getRating()).build();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		Event event = (Event) obj;
+		//@formatter:off
+		return new EqualsBuilder().appendSuper(super.equals(event))
+				.append(getName(), event.getName())
+				.append(getRating(), event.getRating()).isEquals();
+				
+		//@formatter:on
+	}
+	
+	@Override
+	public int hashCode() {
+		//@formatter:off
+		return new HashCodeBuilder(17, 67)
+				.append(getName())
+				.append(getRating()).toHashCode();
+		//@formatter:on
 	}
 	
 	
