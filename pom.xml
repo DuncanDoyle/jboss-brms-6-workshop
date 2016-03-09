@@ -119,6 +119,14 @@
 				<version>1.0.13</version>
 				<scope>compile</scope>
 			</dependency>
+			
+			<!-- Test Dependencies -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -168,6 +176,7 @@
 		<module>Brms6WorkshopTicketsUseCaseRules6</module>
 		<module>Brms6WorkshopTicketsUseCaseRules7</module>
 		<module>Brms6WorkshopTicketsUseCaseRules8</module>
+		<module>Brms6WorkshopTicketsUseCaseRules9</module>
 		<module>Brms6WorkshopTicketsUseCaseRulesMain</module>
 	</modules>
 </project>

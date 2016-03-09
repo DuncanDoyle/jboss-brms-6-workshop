@@ -229,19 +229,19 @@ The result, which is a list of `TicketOffer`s with the tickets available for thi
 The main logic in these labs is defined in the *Brms6WorkshopTicketsUseCaseRulesMain* project. It contains the logic to build a `KieContainer` and `KieSession`, creates the fact objects, inserts them into the `KieSession` 
 and fires the rules. The various other projects define the ruleset(s) that are used at runtime. We will start with a very simple rulebase with just 2 rules, and gradually build up a more complex set of rules.
 
-==== Lab 1
+==== Lab 1 - Order of Execution
 We start with 2 simple rules in *Brms6WorkshopTicketsUseCaseRules1*, one that creates the `TicketOffer`s, and one that filters out the tickets for people below the age of 18. Execute the application by running 
 the `Main` class. Observe the output. What is wrong with our rulebase? Can you fix it? How? 
 
 A possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules2*.
 
-==== Lab 2
+==== Lab 2 - Rule Implementation
 Start with the *Brms6WorkshopTicketsUseCaseRules2* project. We will now implement a rule filters out all tickets out all tickets with 'TICKET_CLASS.GOLD' if our `Person` does not have an `EventPass`. 
 I.e. we only allow people with a special event-pass to purchase these tickets.
 
 A possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules3*.
 
-==== Lab 3
+==== Lab 3 - Looping 2
 Start with the *Brms6WorkshopTicketsUseCaseRules3* project. In this lab implement 2 discount rules. The first rule gives a 25% discount for on all tickets for non-adults (people below the age of 18) and the second rule applies
 a 10% discount on all tickets for people with an `EventPass`.
 
@@ -250,7 +250,7 @@ anything you encounter with the group. We're here to learn :-)
 
 Again, a possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules4*.
 
-=== Lab 4
+=== Lab 4 - Inference
 Start with the *Brms6WorkshopTicketsUseCaseRules4* project. If all is well, we have now got 2 rules in our ruleset that check on the same constraint, namely if a `Person` is under the age of 18.
  One of the powers of Drools is the possibility to infer new data (facts) in rules, and add this new inferred data as a constraint to other rules. We're going to apply this technique in this lab.
 
@@ -258,7 +258,7 @@ In our fact model, we have a class called `IsAdult`. Create a new rule that infe
 
 A possible solution is implemented in *Brms6WorkshopTicketsUseCaseRules5*.
 
-=== Lab 5
+=== Lab 5 - Agenda-Group
 Start with the *Brms6WorkshopTicketsUseCaseRules5* project. We've heavily used the 'salience' keyword in our rules to define rule execution ordering. Using 'salience' is however very error-prone. A better solution is to group rules
 into various 'agenda-groups', and control the order of execution of the rules by setting the focus on the correct agenda-group.
 
@@ -269,19 +269,19 @@ Note that the 'agenda-group' is a stack-based system on which we push and from w
 
 A possible solutions is implemented in *Brms6WorkshopTicketsUseCaseRules6*.
 
-=== Lab 6
+=== Lab 6 - RuleFlow-Group
 Start with the *Brms6WorkshopTicketsUseCaseRules6* project. Instead of 'agenda-group', we will now define the ordering of the rule execution with a BPMN2 RuleFlow. Change the implementation into one 
 that use a RuleFlow and `ruleflow-group`.
 
 A solution is implemented in the *Brms6WorkshopTicketsUseCaseRules7* project.
 
-=== Lab 7
+=== Lab 7 - From
 Start with the *Brms6WorkshopTicketsUseCaseRules7* project. In the current rulebase, the discount values are statically defined. We however want to retrieve these discounts from a Service. Therefore, we've added the `DiscountService` 
 Java class to our project. Use this class to retrieve the discount values for 2 discount rules. Hint: Use the `from` keyword.
 
 A solution is implemented in the *Brms6WorkshopTicketsUseCaseRules8* project.
 
-=== Lab 8
+=== Lab 8 - Logical Inserts
 Start with the *Brms6WorkshopTicketsUseCaseRules8* project. This is actually the same starting point as Lab 6, hence, the rules use Agenda-Groups instead of BPMN2 RuleFlow-Groups.
 
 In this lab we will work with the Drools Truth Maintenance System (TMS). TMS works around the concept of _Logical Inserts_. When a fact is inserted into the session in the _standard/normal_ way, the fact is only removed from the session when it is explicitly removed by Java code or by (another) rule. When you logically insert a fact into the session, the fact is automatically removed when the conditions that logically inserted the fact are no longer true.
@@ -291,4 +291,55 @@ One can logically insert a fact into the session by using the `insertLogical` ke
 Using this mechanism, we can rewrite the rules in such a way that the order of execution of the rules (especially the _filter_ rules) is no longer important. Remove the "Agenda-Group setup" rule from the DRL. Remove the `agenda-group` definitions from the rules, and rewrite the rules in such a way that it produces the same output as when using the Agenda Groups.
 
 NOTE: Using TMS can have some performance impact, so the implementation of Lab 8, using logical inserts, is not necessarily a better implementation than the implementation using agenda-groups. The lab has been constructed to explain the concept of _logical inserts_, not to implement the best performing rule-base.
+
+
+=== Lab 9 - Unit Tests
+To build-in quality in your rules-system, it is extremely import to test your rules. No one wants to be responsible for an un-tested, rule in production that, due to an error, costs your company milliosn of euros/dollars/_your currency of choice_.
+
+Testing rules can be hard, especially when we have a large rule-base (`KieBase`). How do you test a `KieBase` containing 1000 rules? What we would like to do is to test rules individually, or in groups. Group-testing of rules can be done by utilizing construtcs that have seen in previous labs: agenda-group and ruleflow-group. I.e. when we want to just test the rules of a certain group, the only thing we need to do is make sure that only that group gets activated (i.e. gets the focus).
+
+There is however also a mechanism to test individual rules. To test individual rules, we can pass a, so called, `AgendaFilter` to the `KieSession.fireAllRules` method. The `AgendaFilter` allows us to control whic rule matches get _accepted_ and will be placed on the Drools agenda for execution. Using this approach we can _filter_ which rules get fired when we call the `fireAllRules` method, which allows us to test individual rule execution in, for example, unit-tests.
+
+Start with the *Brms6WorkshopTicketsUseCaseRules9* project. This is actually the same starting point as Lab 6, hence, the rules use Agenda-Groups instead of BPMN2 RuleFlow-Groups.
+
+The project contains a unit-test class, `RulesTest`, with one unit-test, `testDiscountForNonAdultsRule`. This unit-test is annotated with the JUnit `@Ignore` annotation. The reason for this is that the unit-test, in its current state will fail, and would therefore fail the build of the labs. The exercise of this lab is:
+
+. Remove the `@Ignore` annotation from the unit-test and run the test. This will throw an NPE.
+. Change the unit-test in such a way that it will only test the _"25% discount for non-adults"_ rule.
+
+
+=== Lab 10 - Property Reactive
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

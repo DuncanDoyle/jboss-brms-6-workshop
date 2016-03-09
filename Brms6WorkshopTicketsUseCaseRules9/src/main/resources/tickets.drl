@@ -13,11 +13,7 @@ import org.jboss.ddoyle.brms.workshop.model.Venue
 
 //declare any global variables here
 global org.jboss.ddoyle.brms.workshop.model.TicketOffers ticketOffers;
-global org.jboss.ddoyle.brms.workshop.DiscountService discountService;
 
-declare MultipleTicketsDiscount
-	numberOfTickets: int
-end
 
 /*
 	Concepts: Tickets of type D cannot be sold to non-adults.
@@ -26,36 +22,40 @@ end
 	Golden tickets can only be sold to people with an Event pass.
 */
 
-/*
- The idea is to use a flow of rules
-
- Technical Rules (assess whether someone is an adult) => Filter (filters tickets we can't sell to this person) -> Create TicketOffers with tickets that all stil there -> Apply discounts on the offers -> Apply additional discounts because of a special card,
-
- Changing the ticket offers can cause rules to fire again, so this might be a nice use-case.
-*/
-
-
-rule "Start ruleflow"
+rule "Agenda-Group setup"
 salience 100
 when
 	Person();
 then
-	kcontext.getKnowledgeRuntime().startProcess("org.jboss.ddoyle.brms.workshop.RuleFlow");	 
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("discount").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("create-offers").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("filter").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("init").setFocus();
 end
-
 
 
 //Check whether person is adultt
 rule "Is Adult"
-ruleflow-group "init"
+agenda-group "init"
 when 
 	$p: Person(age >=18)
 then
 	insert(new IsAdult($p));
 end
 
+rule "Create TicketOffers"
+agenda-group "create-offers"
+when 
+	$t: Ticket() 
+then 
+	TicketOffer tOffer = new TicketOffer($t);
+	ticketOffers.addTicket(tOffer);
+	insert(tOffer);
+end
+
+
 rule "Filter Tickets Adults"
-ruleflow-group "filter" 
+agenda-group "filter" 
 when
 	$p:Person()
 	not (IsAdult(person == $p))
@@ -65,80 +65,38 @@ then
 end
 
 rule "Filter Golden tickets"
-ruleflow-group "filter"
+agenda-group "filter"
 when
 	$p:Person()
-	not (EventPass(person == $p)))
+	not (EventPass(person == $p))
 	$t: Ticket(ticketClass == Ticket.TICKET_CLASS.GOLD)
 then
 	retract($t)
 end
 
-rule "Create TicketOffers"
-ruleflow-group "create-offers"
-when 
-	$t: Ticket() 
-then 
-	TicketOffer tOffer = new TicketOffer($t);
-	ticketOffers.addTicket(tOffer);
-	insert(tOffer);
-end
-
 rule "25% discount for non-adults"
-ruleflow-group "discount"
+agenda-group "discount"
 lock-on-active
 when
 	$p:Person()
 	not (IsAdult(person == $p))
 	$t: TicketOffer()
-	$d: Integer() from discountService.getDiscount(DiscountService.DISCOUNT_CODE.NON_ADULT);
 then
 	modify($t) {
-		addDiscount($d);	
+		addDiscount(25);	
 	}
 end
 
+
 rule "EventPass discount"
-ruleflow-group "discount"
+agenda-group "discount"
 lock-on-active
 when
 	$p:Person()
 	EventPass(person ==$p)
 	$t: TicketOffer()
-	$d: Integer() from discountService.getDiscount(DiscountService.DISCOUNT_CODE.EVENTPASS);
 then
 	modify($t) {
-		addDiscount($d);
+		addDiscount(10);
 	}
 end
-
-
-rule "MultipleTickesAccumulate"
-ruleflow-group "MultipleTicketsDiscount"
-salience 100
-when
-	$nt: Long( longValue >= 8) from accumulate ($t: TicketOffer(), count($t))
-then
-	System.out.println("Number of ticket offers: " + $nt);
-	insert(new MultipleTicketsDiscount());
-end
-
-
-rule "MultipleTicketsDiscount"
-ruleflow-group "MultipleTicketsDiscount"
-salience 50
-when
-	$m: MultipleTicketsDiscount()
-	$t: TicketOffer()
-then
-	modify($t) {
-		addDiscount(5)
-	}
-end
-
-
-
-
-
-
-
