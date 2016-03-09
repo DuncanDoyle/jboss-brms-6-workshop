@@ -1,0 +1,99 @@
+package org.jboss.ddoyle.brms.workshop
+
+//list any import classes here.
+
+import org.jboss.ddoyle.brms.workshop.model.Event
+import org.jboss.ddoyle.brms.workshop.model.EventPass
+import org.jboss.ddoyle.brms.workshop.model.IsAdult
+import org.jboss.ddoyle.brms.workshop.model.Person
+import org.jboss.ddoyle.brms.workshop.model.Ticket
+import org.jboss.ddoyle.brms.workshop.model.TicketOffer
+import org.jboss.ddoyle.brms.workshop.model.TicketOffers
+import org.jboss.ddoyle.brms.workshop.model.Venue
+
+//declare any global variables here
+global org.jboss.ddoyle.brms.workshop.model.TicketOffers ticketOffers;
+
+/*
+	Concepts: Tickets of type D cannot be sold to non-adults.
+	Non-adults get a 25% discount on tickets.
+	Persons with a special event pass get 10% discount on top of all discounts.
+	Golden tickets can only be sold to people with an Event pass.
+*/
+
+rule "Agenda-Group setup"
+salience 100
+when
+	Person();
+then
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("discount").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("create-offers").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("filter").setFocus();
+	kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("init").setFocus();
+end
+
+
+//Check whether person is adultt
+rule "Is Adult"
+agenda-group "init"
+when 
+	$p: Person(age >=18)
+then
+	insert(new IsAdult($p));
+end
+
+rule "Create TicketOffers"
+agenda-group "create-offers"
+when 
+	$t: Ticket() 
+then 
+	TicketOffer tOffer = new TicketOffer($t);
+	ticketOffers.addTicket(tOffer);
+	insert(tOffer);
+end
+
+
+rule "Filter Tickets Adults"
+agenda-group "filter" 
+when
+	$p:Person()
+	not (IsAdult(person == $p))
+	$t:Ticket(event.rating == Event.EVENT_RATING.D)
+then
+	retract($t)
+end
+
+rule "Filter Golden tickets"
+agenda-group "filter"
+when
+	$p:Person()
+	not (EventPass(person == $p))
+	$t: Ticket(ticketClass == Ticket.TICKET_CLASS.GOLD)
+then
+	retract($t)
+end
+
+rule "25% discount for non-adults"
+agenda-group "discount"
+when
+	$p:Person()
+	not (IsAdult(person == $p))
+	$t: TicketOffer()
+then
+	modify($t) {
+		addDiscount(25);	
+	}
+end
+
+
+rule "EventPass discount"
+agenda-group "discount"
+when
+	$p:Person()
+	EventPass(person ==$p)
+	$t: TicketOffer()
+then
+	modify($t) {
+		addDiscount(10);
+	}
+end

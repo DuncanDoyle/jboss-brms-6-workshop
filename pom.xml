@@ -177,6 +177,7 @@
 		<module>Brms6WorkshopTicketsUseCaseRules7</module>
 		<module>Brms6WorkshopTicketsUseCaseRules8</module>
 		<module>Brms6WorkshopTicketsUseCaseRules9</module>
+		<module>Brms6WorkshopTicketsUseCaseRules10</module>
 		<module>Brms6WorkshopTicketsUseCaseRulesMain</module>
 	</modules>
 </project>

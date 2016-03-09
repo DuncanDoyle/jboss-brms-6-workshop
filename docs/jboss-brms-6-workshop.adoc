@@ -307,9 +307,14 @@ The project contains a unit-test class, `RulesTest`, with one unit-test, `testDi
 . Remove the `@Ignore` annotation from the unit-test and run the test. This will throw an NPE.
 . Change the unit-test in such a way that it will only test the _"25% discount for non-adults"_ rule.
 
-
 === Lab 10 - Property Reactive
+In previous labs we've seen how we could stop rules from looping by using the `no-loop` and `lock-on-active` Drools constructs. There is however another option to prevent a modification of a fact to re-trigger rule evaluations (and potentially execution): `@PropertyReactive`.
 
+Property Reactive allows the Drools pattern matching algorithm to only react to modification of properties actually constrained or bound inside of a given pattern. This implies that when one modifies a property of a given fact in the RHS of a rule in a `modify` block, and there are no rules that have a LHS constraint on that property, the rules will not be re-evaluated and will not re-fire.
+
+To show this in action, we have created the *Brms6WorkshopTicketsUseCaseRules10* project, based on the Lab 6 project. However, we have removed the `lock-on-active` keyword from the rules in the _discount_ agenda-group. As these rules modify the `TicketOffer` fact by adding a discount, these rules will start looping. Note however that there is no LHS constraint on the `TicketOffer` 's discount property in the LHS of the rules. Hence, by using the @PropertyReactive feature of Drools, we can prevent these rules from being re-evaluated.
+
+Fix the looping of rules in Lab 10 by using the @PropertyReactive feature of Drools.
 
 
 
