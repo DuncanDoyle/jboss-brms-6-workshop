@@ -144,6 +144,57 @@ image:images/kmodule-example.png["KModule.xml",height=384]
 
 image:images/kmodule-example-2.png["KModule.xml",height=384]
 
+=== BRMS Design Patterns
+BRMS/Drools is a lightweight and flexible rules-engine which can be use in various different environments in different ways. In this section we will discuss a number of `KieSession` and deployment patterns.
+
+We will first look at rule execution. As we have seen earlier, rules can be executed in either a _stateless_ or a _stateful_ session. Second the rules-engine itself can be either deployed "in-process" with the actual application (or service) or as a remote rule execution service. When we combine these 2 parameters, we come to the following 4 options of executing rules.
+
+[width="100%",frame="topbot",options="header,footer"]
+|======================
+|Option |Description|Pros |Cons
+|Embedded Stateless       |The rules-engine runs stateless sessions embedded within the application. The Drools libraries (note, not necessarily the rule definitions) are packaged with the application and embedded into a Java Archive (WAR/EAR), or are referenced as an OSGi bundle. The application integrates with the rules-engine through its Java API. The rules run in a stateless session, which is disposed after the rules have been fired.	|Simple API-based integration between application and rules-engine.
+
+Performant (no remoting)	|Expensive to scale (BRMS subscription needed on every core that serves the application).
+
+Upgrading BRMS implies that the application needs to be upgraded.
+
+|Remote Stateless        |The rules-engine and rules are exposed through a remote service. The application interacts with the remote service via the RESTful or JMS API (out-of-the-box in the kie-execution-server), or via a custom API. The rules sessions is able to serve only a single request. For each request a new session is created.	|Flexible
+
+Potentially more cost-effective (centralized BRMS execution, potentially requiring less subscriptions	|Less performant (marshalling/serialization and network overhead).
+
+More difficult integration (JSON, XML) in comparison with Java API integration.
+|Embedded Stateful        |Like Embedded Stateless, but with long-running sessions. This architecture is usually used in Complex Event Processin scenario's where sessions consume a constant stream of events and/or facts on which they need to operate. The session is kept alive until the application calls the session's `dispose` method.	|Allows for multiple rule firings on a single session, giving the ability to serve fact/event streams.
+
+Complex Event Processing	| Increases application complexity.
+
+Expensive to scale (BRMS subscription needed on every core that serves the application).
+
+Upgrading BRMS implies that the application needs to be upgraded.
+|Remote Stateful        |Not (yet) supported by the BRMS KIE-Execution-Server. Can be designed and implemented as a stateful service, for example via Remote Stateful Session Beans (SFSB) EJBs.	|	|Complex
+
+HA concerns
+
+Less performant (marshalling/serialization and network overhead).
+|======================
+
+
+We will now look at the various options/patterns of rule deployment. As we have seen, Drools rules are packaged in Knowledge JARs, or KJARs, and there are multiple options to reference the rules from the rules engine.
+
+[width="100%",frame="topbot",options="header,footer"]
+|======================
+|Option |Description|Pros |Cons
+|Push (Remote/KIE Server)	|The rule deployment is pushed to the KIE-Execution Server via the KIE Server Controller (in managed-mode) or via the KIE-Execution Server RESTful API (unmanaged). Although the deployment GAV (GroupId, ArtifactId, Version) is pushed to the server, the actual KJAR artifact is still fetched from the Maven repository by the execution server.	| Flexible
+
+Rules LCM outside of application	|Requires operationalization of the rules deployment interface outside normal application deployments	
+|Static (Embedded)	|The KJAR is packaged and deployed with the application. The KieContainer is loaded as a KieClasspathContainer.	|Simple
+
+Uses existing application deployment process	|To upgrade rules, the application needs to be upgraded (and deployed).
+|Polling/Scanning (Embedded)	|The KJAR is dynamically fetched from the `KieRepository` at runtime using a given `ReleaseId` (Maven GAV). A `KieScanner` is configured on the `KieContainer` to scan for updates of the given KJAR at runtime and to dynamically update the `KieBases` in the `KieContainer` and any active `KieSessions`.	|Allows for update of rules at runtime without application restarts.	|Dynamically updating rules at runtime can be dangerous when rules have not been properly tested.
+
+Rules LCM has to be managed outside of the application.
+|======================
+
+
 === Example API usage
 As mentioned in the previous section, prior to Drools 6, one required quite a bit of code to build _KnowledgeBase_ and _KnowlegdeSession_, as is shown below:
 
@@ -315,36 +366,4 @@ Property Reactive allows the Drools pattern matching algorithm to only react to 
 To show this in action, we have created the *Brms6WorkshopTicketsUseCaseRules10* project, based on the Lab 6 project. However, we have removed the `lock-on-active` keyword from the rules in the _discount_ agenda-group. As these rules modify the `TicketOffer` fact by adding a discount, these rules will start looping. Note however that there is no LHS constraint on the `TicketOffer` 's discount property in the LHS of the rules. Hence, by using the @PropertyReactive feature of Drools, we can prevent these rules from being re-evaluated.
 
 Fix the looping of rules in Lab 10 by using the @PropertyReactive feature of Drools.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
